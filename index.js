@@ -11,7 +11,7 @@ const todoList = document.querySelector(".to-do__list");
 const formSubmit = document.querySelector(".to-do__form");
 const taskInput = document.querySelector(".to-do__input");
 
-function retrieveTasks() {
+function loadTasks() {
 	const stored = localStorage.getItem("todos");
 	if (stored) {
 		return JSON.parse(stored);
@@ -19,7 +19,7 @@ function retrieveTasks() {
 	return tasks;
 }
 
-function buildTaskElement(taskText) {
+function createItem(taskText) {
 	const itemTemplate = document.getElementById("to-do__item-template");
 	const element = itemTemplate.content.querySelector(".to-do__item").cloneNode(true);
 	const taskDisplay = element.querySelector(".to-do__item-text");
@@ -32,15 +32,15 @@ function buildTaskElement(taskText) {
 	removeBtn.addEventListener("click", () => {
 		element.remove();
 		const currentTasks = extractTasksFromDOM();
-		persistTasks(currentTasks);
+		saveTasks(currentTasks);
 	});
 
 	copyBtn.addEventListener("click", () => {
 		const text = taskDisplay.textContent;
-		const duplicate = buildTaskElement(text);
+		const duplicate = createItem(text);
 		todoList.prepend(duplicate);
 		const currentTasks = extractTasksFromDOM();
-		persistTasks(currentTasks);
+		saveTasks(currentTasks);
 	});
 
 	return element;
@@ -55,26 +55,26 @@ function extractTasksFromDOM() {
 	return extractedTasks;
 }
 
-function persistTasks(updatedTasks) {
+function saveTasks(updatedTasks) {
 	localStorage.setItem("todos", JSON.stringify(updatedTasks));
 }
 
-formSubmit.addEventListener("submit", (e) => {
+formSubmit.addEventListener("submit", function (e) {
 	e.preventDefault();
 	const inputValue = taskInput.value;
 	if (inputValue.trim() === "") {
 		return;
 	}
-	const item = buildTaskElement(inputValue);
+	const item = createItem(inputValue);
 	todoList.prepend(item);
 	tasks = extractTasksFromDOM();
-	persistTasks(tasks);
+	saveTasks(tasks);
 	taskInput.value = "";
 });
 
-tasks = retrieveTasks();
+tasks = loadTasks();
 tasks.forEach((task) => {
-	const element = buildTaskElement(task);
+	const element = createItem(task);
 	todoList.append(element);
 });
 
